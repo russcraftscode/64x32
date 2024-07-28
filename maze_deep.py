@@ -1,139 +1,11 @@
+# Maze randomization algorithm by CaptainLuma credit: https://github.com/CaptainLuma/New-Maze-Generating-Algorithm
+# Spectrum code by Grismar credit: https://stackoverflow.com/questions/66630051/how-to-create-a-1000-color-rgb-rainbow-gradient-in-python
+
 import random
-
-
-class Maze:
-    def __init__(self, grid, x_size, y_size):
-        self.cols = x_size
-        self.rows = y_size
-        self.max_shuffles = 5000
-        self.current_shuffles = 0
-        self.grid = grid
-        # create the nodes
-        self.nodes = []
-        for x in range(self.cols):
-            for y in range(self.rows):
-                self.nodes.append(Maze_Node(x, y))
-        # link the nodes to their surroundings
-        for x in range(1, self.cols):  # center nodes
-            for y in range(1, self.rows):
-                n = self.get_node(x, y)
-                n.north = self.get_node(x, y - 1)
-                n.east = self.get_node(x + 1, y)
-                n.west = self.get_node(x - 1, y)
-                n.south = self.get_node(x, y + 1)
-        y = 0  # top row
-        for x in range(1, self.cols):
-            n = self.get_node(x, y)
-            n.east = self.get_node(x + 1, y)
-            n.west = self.get_node(x - 1, y)
-            n.south = self.get_node(x, y + 1)
-        y = self.rows - 1  # bottom row
-        for x in range(1, self.cols):
-            n = self.get_node(x, y)
-            n.north = self.get_node(x, y - 1)
-            n.east = self.get_node(x + 1, y)
-            n.west = self.get_node(x - 1, y)
-        x = 0  # left side
-        for y in range(1, self.rows):
-            n = self.get_node(x, y)
-            n.north = self.get_node(x, y - 1)
-            n.east = self.get_node(x + 1, y)
-            n.south = self.get_node(x, y + 1)
-        x = self.cols - 1  # right side
-        for y in range(1, self.rows):
-            n = self.get_node(x, y)
-            n.north = self.get_node(x, y - 1)
-            n.west = self.get_node(x - 1, y)
-            n.south = self.get_node(x, y + 1)
-        # upper left corner
-        x = 0
-        y = 0
-        n = self.get_node(x, y)
-        n.east = self.get_node(x + 1, y)
-        n.south = self.get_node(x, y + 1)
-        # upper right corner
-        x = self.cols - 1
-        y = 0
-        n = self.get_node(x, y)
-        n.west = self.get_node(x - 1, y)
-        n.south = self.get_node(x, y + 1)
-        # lower left corner
-        x = 0
-        y = self.rows - 1
-        n = self.get_node(x, y)
-        n.north = self.get_node(x, y - 1)
-        n.east = self.get_node(x + 1, y)
-        # lower right corner
-        x = self.cols - 1
-        y = self.rows - 1
-        n = self.get_node(x, y)
-        n.north = self.get_node(x, y - 1)
-        n.west = self.get_node(x - 1, y)
-        self.anchor = n
-
-        # add the direction properties to each node by linking it to the next node
-        for y in range(self.rows):
-            for x in range(self.cols):
-                self.get_node(x, y).next = self.get_node(x, y).east
-            self.get_node(self.cols - 1, y).next = self.get_node(self.cols - 1, y).south
-
-    def shuffle(self):
-        """Uses CaptainLuma's maze generation algorithm to randomize a maze"""
-        # credit: https://github.com/CaptainLuma/New-Maze-Generating-Algorithm
-        next_to_anchor = self.next_to(self.anchor)
-        new_anchor = random.choice(next_to_anchor)
-        self.anchor.next = new_anchor
-        self.anchor = new_anchor
-        self.anchor.next = None
-
-
-    def fixed_anchor(self):
-        """this sets the anchor to the bottom right of the maze"""
-        while self.anchor !=  self.get_node(self.cols-1, self.rows-1):
-            self.shuffle()
-            print(f"{self.anchor.x_pos}, {self.anchor.y_pos}")
-
-    def next_to(self, node):
-        """returns all the existing nodes that are next to a given node"""
-        next_to_node = []
-        if node.north != None: next_to_node.append(node.north)
-        if node.east != None: next_to_node.append(node.east)
-        if node.west != None: next_to_node.append(node.west)
-        if node.south != None: next_to_node.append(node.south)
-        return next_to_node
-
-    def get_node(self, x, y):
-        for n in self.nodes:
-            if n.x_pos == x and n.y_pos == y:
-                return n
-        return None
-
-    def draw(self):
-        """updates the display with data based on the maze. Pixel locations are doubled to account for space between nodes"""
-        self.grid.wipe()
-        for n in self.nodes:
-            if n == self.anchor:
-                self.grid.set_pixel(n.x_pos * 2, n.y_pos * 2, [200, 10, 10])
-            else:
-                self.grid.set_pixel(n.x_pos * 2, n.y_pos * 2, [200, 200, 200])
-            if n.next != None:
-                self.grid.set_pixel((n.x_pos * 2 + n.next.x_pos * 2) // 2, (n.y_pos * 2 + n.next.y_pos * 2) // 2,
-                                    [200, 200, 200])
-
-
-class Maze_Node:
-    def __init__(self, x, y):
-        self.x_pos = x
-        self.y_pos = y
-        self.north = None
-        self.south = None
-        self.east = None
-        self.west = None
-        self.next = None
-
+from maze import Maze
 
 class Deep_Maze_Solver:
-    def __init__(self, grid, show_seek=None, show_retreat=None, show_solve=None, show_maze_build=None):
+    def __init__(self, grid, show_seek=False, show_retreat=False, show_solve=False, show_maze_build=False):
         self.grid = grid
         self.visited_spaces = []
         self.current_path = []
@@ -144,22 +16,17 @@ class Deep_Maze_Solver:
         self.maze_built = False
         self.shuffle_count = 0
         self.max_shuffles = self.y_size * self.x_size * 10
-        if show_seek is None:
-            self.SHOW_SEEK = False
-        else:
-            self.SHOW_SEEK = show_seek
-        if show_retreat is None:
-            self.SHOW_RETREAT = False
-        else:
-            self.SHOW_RETREAT = show_retreat
-        if show_solve is None:
-            self.SHOW_SOLVE = False
-        else:
-            self.SHOW_SOLVE = show_solve
-        if show_maze_build is None:
-            self.SHOW_MAZE = False
-        else:
-            self.SHOW_MAZE = show_maze_build
+        self.SHOW_SEEK = show_seek
+        self.SHOW_RETREAT = show_retreat
+        self.SHOW_SOLVE = show_solve
+        self.SHOW_MAZE = show_maze_build
+        self.spectrum = []
+        for r, g, b in zip(
+                (list(reversed(range(256))) + [0] * 256),
+                (list(range(256)) + list(reversed(range(256)))),
+                ([0] * 256 + list(range(256)))):
+            self.spectrum.append([r, g, b])
+        self.spectrum.reverse()
 
     def get_options(self, node):
         """ gets all spaces that are next to the node that are linked to or from the node"""
@@ -179,7 +46,8 @@ class Deep_Maze_Solver:
         return options
 
     def move(self):
-        """either seeks towards a possible solution or retreats if at a dead end"""
+        """either seeks towards a possible solution or retreats if at a dead end.
+        Returns true if seeking and false if retreating"""
         # determine if we are searching or retreating
         if True:
             options = self.get_options(self.current_path[-1])
@@ -189,39 +57,72 @@ class Deep_Maze_Solver:
                     viable_options.append(option)
             if len(viable_options) > 0:
                 self.seek(viable_options)
+                return True
             else:
                 self.retreat()
+                return False
+
+    def at_end_of_path(self):
+        """Returns true if at end of path"""
+        options = self.get_options(self.current_path[-1])
+        viable_options = []
+        for option in options:
+            if option not in self.visited_spaces:
+                viable_options.append(option)
+        if len(viable_options) > 0: return False
+        return True
+
 
     def step(self):
         """advances one graphical step. Returns false when it is time to create a new Deep_Maze_Solver object"""
-        if self.maze_built == False: # step the maze generation
-            if self.SHOW_MAZE == False: # if maze generation is not to be shown
+        if self.maze_built == False:  # step the maze generation
+            if self.SHOW_MAZE == False:  # if maze generation is not to be shown
                 for s in range(self.max_shuffles):
                     self.maze.shuffle()
-                # if the maze solving process is not to be animated, just put the anchor on the bottom right
-                if self.SHOW_SOLVE == False:
-                    self.maze.fixed_anchor()
+                self.maze.fixed_anchor()
                 self.maze_built = True
             # if maze generation is to be shown
             elif self.shuffle_count < self.max_shuffles:
                 self.maze.shuffle()
                 self.shuffle_count += 1
-                print(self.shuffle_count)
+                self.maze.draw()
                 if self.shuffle_count > self.max_shuffles:
                     self.maze_built = True
-        else: # step the solving
+        else:  # step the solving
             # if the steps of solving the maze is to be shown
             if self.SHOW_SOLVE:
-                if self.SHOW_SOLVE:
-                    pass
+                # if the individual steps towards a path end are to be shown
+                if self.SHOW_SEEK:
+                    # if not animating retreat then first pull back until a new path is found
+                    if not self.SHOW_RETREAT:
+                        while self.at_end_of_path():
+                            self.move()
+                    self.move()
+                    self.draw()
+                    # if the maze is solved return false to stop the loop in the main class
+                    if self.is_solved():
+                        return False
+                # if the only thing to be shown is the path when it reaches an end
+                if not self.SHOW_SEEK:
+                    # first retreat until a new path is found
+                    while self.at_end_of_path():
+                        self.move()
+                    # seek until a path has no more options
+                    while not self.at_end_of_path():
+                        self.move()
+                        if self.is_solved():
+                            self.draw()
+                            return False
+                    self.draw()
+                    if self.is_solved():
+                        return False
             # if the steps of solving the maze are not to be shown
             else:
                 while not self.is_solved():
                     self.move()
                 self.draw()
-                return False
-
-        return True
+                return False # return false to indicate maze is solved
+        return True # if the maze has not been solved return true
 
     def seek(self, viable_options):
         """seeks out one more space that has not been visited"""
