@@ -5,7 +5,7 @@ import random
 from maze import Maze
 
 class Deep_Maze_Solver:
-    def __init__(self, grid, show_seek=False, show_retreat=False, show_solve=False, show_maze_build=False):
+    def __init__(self, grid, show_seek=False, show_retreat=False, show_solve=False, show_maze_build=False, show_visited=False):
         self.grid = grid
         self.visited_spaces = []
         self.current_path = []
@@ -20,6 +20,7 @@ class Deep_Maze_Solver:
         self.SHOW_RETREAT = show_retreat
         self.SHOW_SOLVE = show_solve
         self.SHOW_MAZE = show_maze_build
+        self.SHOW_VISITED = show_visited
         self.spectrum = []
         for r, g, b in zip(
                 (list(reversed(range(256))) + [0] * 256),
@@ -27,6 +28,11 @@ class Deep_Maze_Solver:
                 ([0] * 256 + list(range(256)))):
             self.spectrum.append([r, g, b])
         self.spectrum.reverse()
+
+    def set_maze(self, maze):
+        self.maze = maze
+        self.current_path.append(self.maze.get_node(0, 0))
+        self.maze_built = True
 
     def get_options(self, node):
         """ gets all spaces that are next to the node that are linked to or from the node"""
@@ -136,6 +142,16 @@ class Deep_Maze_Solver:
     def draw(self):
         """updates the display with data based on the maze and pathfinder. Pixel locations are doubled to account for space between nodes"""
         self.maze.draw()
+        for n in self.visited_spaces:
+            self.grid.set_pixel(n.x_pos * 2, n.y_pos * 2, [100, 100, 120])
+            if n.next != None:
+                if n.next in self.visited_spaces:
+                    self.grid.set_pixel((n.x_pos * 2 + n.next.x_pos * 2) // 2, (n.y_pos * 2 + n.next.y_pos * 2) // 2,
+                                    [100, 100, 120])
+            #if prev_square != n:  # connect node with it's previous node
+            #    self.grid.set_pixel((n.x_pos + prev_square.x_pos) * 2 // 2, (n.y_pos + prev_square.y_pos) * 2 // 2,
+            #                        [10, 200, 10])
+            #prev_square = n
         prev_square = self.current_path[0]
         for n in self.current_path:
             self.grid.set_pixel(n.x_pos * 2, n.y_pos * 2, [10, 200, 10])

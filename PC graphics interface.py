@@ -2,18 +2,25 @@
 
 import pygame
 import Pixel_Grid
-from maze_wide import Width_Maze_Solver
+from maze_wide import Wide_Maze_Solver
 from maze_deep import Deep_Maze_Solver
+from maze_versus import Versus_Solver
+from rainfall import Rainfall
+from starfield import Starfield
 
 # Constants
 FRAME_RATE = 30
-SQUARE_SIZE = 30
-SQUARE_START_X = SQUARE_SIZE * 2
-SQUARE_START_Y = SQUARE_SIZE * 2
+
+SQUARE_SIZE = 46
+#SQUARE_SIZE = 8
+
 PIXELS_X = 64
 PIXELS_Y = 32
-# PIXELS_X = 16 #DEBUG
-# PIXELS_Y = 8 # DEBUG
+#PIXELS_X = 256
+#PIXELS_Y = 128
+
+SQUARE_START_X = SQUARE_SIZE * 2
+SQUARE_START_Y = SQUARE_SIZE * 2
 SCREEN_SIZE_X = (SQUARE_START_X) + SQUARE_SIZE * PIXELS_X + (SQUARE_START_X)
 SCREEN_SIZE_Y = (SQUARE_START_Y) + SQUARE_SIZE * PIXELS_Y + (SQUARE_START_Y)
 BACKGROUND_COLOR = [30, 30, 30]
@@ -26,7 +33,10 @@ MAX_MAZE_SHUFFLES = 4000
 
 # Define the dimensions of
 # screen object(width,height)
-screen = pygame.display.set_mode((SCREEN_SIZE_X, SCREEN_SIZE_Y))
+#screen = pygame.display.set_mode((SCREEN_SIZE_X, SCREEN_SIZE_Y))
+screen = pygame.display.set_mode((3840, 2160), pygame.FULLSCREEN ,  display=1)
+
+
 
 # Set the caption of the screen
 pygame.display.set_caption('64x32 Desktop')
@@ -63,13 +73,13 @@ while True:
     match mode:
         case "startup":
 
-            mode = "wide"
+            mode = "starfield"
             print("startup")
             draw(grid)
 
-        case "wide":
-            solver = Width_Maze_Solver(grid )
-            while solver.step() and mode == "wide":
+        case "starfield":
+            stars = Starfield(grid )
+            while stars.step() and mode == "starfield":
                 draw(grid)
                 pygame.time.wait(1000 // FRAME_RATE)
                 for event in pygame.event.get():
@@ -77,15 +87,46 @@ while True:
                         pygame.quit()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
-                            mode = "startup"
+                            mode = "rainfall"
                         if event.key == pygame.K_ESCAPE:
                             pygame.quit()
             draw(grid)
             pygame.time.wait(1000)
-            mode = "deep"
+
+        case "rainfall":
+            rain = Rainfall(grid, fillable=True )
+            while rain.step() and mode == "rainfall":
+                draw(grid)
+                pygame.time.wait(1000 // FRAME_RATE)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            mode = "wide"
+                        if event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+            draw(grid)
+            pygame.time.wait(1000)
+
+        case "wide":
+            solver = Wide_Maze_Solver(grid, whole_layer_step=True )
+            while solver.step() and mode == "wide":
+                draw(grid)
+                #pygame.time.wait(1000 // FRAME_RATE)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            mode = "deep"
+                        if event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+            draw(grid)
+            pygame.time.wait(1000)
 
         case "deep":
-            solver = Deep_Maze_Solver(grid, show_solve=True, show_seek=True )
+            solver = Deep_Maze_Solver(grid, show_solve=True, show_seek=True, show_visited=True )
             while solver.step() and mode == "deep":
                 draw(grid)
                 pygame.time.wait(1000 // FRAME_RATE)
@@ -94,12 +135,27 @@ while True:
                         pygame.quit()
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
-                            mode = "startup"
+                            mode = "versus"
                         if event.key == pygame.K_ESCAPE:
                             pygame.quit()
             draw(grid)
             pygame.time.wait(1000)
-            mode = "wide"
+
+        case "versus":
+            solver = Versus_Solver(grid )
+            while solver.step() and mode == "versus":
+                draw(grid)
+                pygame.time.wait(1000 // FRAME_RATE)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            mode = "starfield"
+                        if event.key == pygame.K_ESCAPE:
+                            pygame.quit()
+            draw(grid)
+            pygame.time.wait(1000)
 
 
 

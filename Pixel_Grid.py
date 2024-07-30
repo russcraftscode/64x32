@@ -7,7 +7,6 @@ class Pixel_Grid:
         self.background_color = background
         total_pixels = cols * rows
         self.pixels = [[0, 0, 0] for x in range(total_pixels)]
-        print(f"pixel count = {len(self.pixels)}")
 
 
     def fill(self, color):

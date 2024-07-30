@@ -1,15 +1,11 @@
 # Spectrum code by Grismar credit: https://stackoverflow.com/questions/66630051/how-to-create-a-1000-color-rgb-rainbow-gradient-in-python
 # Maze randomization algorithm by CaptainLuma credit: https://github.com/CaptainLuma/New-Maze-Generating-Algorithm
 
-
-
 from maze import Maze
 
-COLOR_ADVANCE = 5
 
 
-
-class Width_Maze_Solver:
+class Wide_Maze_Solver:
     """ solves a maze by searching wide"""
 
     def __init__(self, grid, whole_layer_step=False, show_solve = False, show_maze_build = False):
@@ -31,10 +27,18 @@ class Width_Maze_Solver:
                 ([0] * 256 + list(range(256)))):
             self.spectrum.append([r, g, b])
         self.spectrum.reverse()
+        self.COLOR_ADVANCE = int( len(self.spectrum)//(self.x_size + self.y_size * 3 ) )
+        if self.COLOR_ADVANCE <= 0:
+            self.COLOR_ADVANCE = 1
         self.WHOLE_LAYER_STEPS = whole_layer_step
         self.SHOW_SOLVE = show_solve
         self.SHOW_MAZE = show_maze_build
 
+    def set_maze(self, maze):
+        self.maze = maze
+        self.layers = [[self.maze.nodes[0]]]
+        self.current_layer = [self.maze.nodes[0]]
+        self.maze_built = True
 
     def step(self):
         """advances one graphical step. Returns false when it is time to create a new Wide_Maze_Solver object"""
@@ -42,9 +46,7 @@ class Width_Maze_Solver:
             if self.SHOW_MAZE == False:  # if maze generation is not to be shown
                 for s in range(self.max_shuffles):
                     self.maze.shuffle()
-                # if the maze solving process is not to be animated, just put the anchor on the bottom right
-                if self.SHOW_SOLVE == False:
-                    self.maze.fixed_anchor()
+                self.maze.fixed_anchor()
                 self.maze_built = True
             # if maze generation is to be shown
             elif self.shuffle_count < self.max_shuffles:
@@ -94,27 +96,6 @@ class Width_Maze_Solver:
                 return not solved
         return True
 
-    def step_old(self):
-        """searches another node and returns true if goal is found"""
-        # determine if we have a full layer
-        full_layer = True
-        for n in self.current_layer:
-            if n not in self.working_layer:
-                full_layer = False
-
-        if full_layer:
-            new_layer = []
-            for n in self.current_layer:
-                new_layer.append(n)
-            self.layers.append(new_layer)
-            self.current_layer = self.next_layer()
-            self.working_layer = []
-        else:
-            # grab the next node from the current layer to add to the working layer
-            self.working_layer.append(self.current_layer[len(self.working_layer)])
-        solved = self.maze.anchor in self.working_layer
-        return solved
-
 
     def next_layer(self):
         """finds the next layer of spaces that can be reached"""
@@ -147,7 +128,7 @@ class Width_Maze_Solver:
         color_counter = 0
         #draw the prvious layers
         for l_count, layer in enumerate(self.layers):
-            if color_counter < len(self.spectrum) - 20: color_counter += COLOR_ADVANCE
+            if color_counter < len(self.spectrum) - 20: color_counter += self.COLOR_ADVANCE
             for n in layer:
                 self.grid.set_pixel(n.x_pos * 2, n.y_pos * 2,
                                     [self.spectrum[color_counter][0], self.spectrum[color_counter][1],
@@ -174,9 +155,9 @@ class Width_Maze_Solver:
         #draw the current search layer
         for n in self.working_layer:
             self.grid.set_pixel(n.x_pos * 2, n.y_pos * 2,
-                                [self.spectrum[color_counter + COLOR_ADVANCE][0],
-                                 self.spectrum[color_counter + COLOR_ADVANCE][1],
-                                 self.spectrum[color_counter + COLOR_ADVANCE][2]])
+                                [self.spectrum[color_counter + self.COLOR_ADVANCE][0],
+                                 self.spectrum[color_counter + self.COLOR_ADVANCE][1],
+                                 self.spectrum[color_counter + self.COLOR_ADVANCE][2]])
             # connect node with its previous node
             prev_node = None
             if n.north in self.layers[-1]:
@@ -194,6 +175,6 @@ class Width_Maze_Solver:
                 if n.next == n.south: prev_node = n.south
             if prev_node != None:
                 self.grid.set_pixel((n.x_pos + prev_node.x_pos) * 2 // 2, (n.y_pos + prev_node.y_pos) * 2 // 2,
-                                    [self.spectrum[color_counter + COLOR_ADVANCE][0],
-                                     self.spectrum[color_counter + COLOR_ADVANCE][1],
-                                     self.spectrum[color_counter + COLOR_ADVANCE][2]])
+                                    [self.spectrum[color_counter + self.COLOR_ADVANCE][0],
+                                     self.spectrum[color_counter + self.COLOR_ADVANCE][1],
+                                     self.spectrum[color_counter + self.COLOR_ADVANCE][2]])
