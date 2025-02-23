@@ -11,8 +11,23 @@ from starfield import Starfield
 # Constants
 FRAME_RATE = 30
 
-SQUARE_SIZE = 46
+
 #SQUARE_SIZE = 8
+
+DISPLAY_CHOICE = 0 # 1 for second monitor
+#UHD_DISPLAY = True # Uncomment if using 4k display
+UHD_DISPLAY = False # Uncomment if using 1080 display
+
+if UHD_DISPLAY:
+    HORIZONTAL_RES = 3840
+    VERTICAL_RES = 2160
+else:
+    HORIZONTAL_RES = 1920
+    VERTICAL_RES = 1080
+
+SQUARE_SIZE = HORIZONTAL_RES // (66)
+#SQUARE_SIZE = 1920 // (66)
+
 
 PIXELS_X = 64
 PIXELS_Y = 32
@@ -34,7 +49,8 @@ MAX_MAZE_SHUFFLES = 4000
 # Define the dimensions of
 # screen object(width,height)
 #screen = pygame.display.set_mode((SCREEN_SIZE_X, SCREEN_SIZE_Y))
-screen = pygame.display.set_mode((3840, 2160), pygame.FULLSCREEN ,  display=1)
+screen = pygame.display.set_mode((HORIZONTAL_RES, VERTICAL_RES), pygame.FULLSCREEN, display=DISPLAY_CHOICE)
+
 
 
 
@@ -73,7 +89,7 @@ while True:
     match mode:
         case "startup":
 
-            mode = "starfield"
+            mode = "wide"
             print("startup")
             draw(grid)
 
@@ -113,7 +129,7 @@ while True:
             solver = Wide_Maze_Solver(grid, whole_layer_step=True )
             while solver.step() and mode == "wide":
                 draw(grid)
-                #pygame.time.wait(1000 // FRAME_RATE)
+                pygame.time.wait(1000 // FRAME_RATE)
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         pygame.quit()
@@ -126,7 +142,7 @@ while True:
             pygame.time.wait(1000)
 
         case "deep":
-            solver = Deep_Maze_Solver(grid, show_solve=True, show_seek=True, show_visited=True )
+            solver = Deep_Maze_Solver(grid, show_solve=True, show_seek=False, show_visited=True )
             while solver.step() and mode == "deep":
                 draw(grid)
                 pygame.time.wait(1000 // FRAME_RATE)

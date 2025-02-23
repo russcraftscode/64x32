@@ -24,11 +24,11 @@ class Starfield:
         rise = (random.random() * 2 - 1 ) / dist
         run = (random.random() * 2 - 1 ) / dist
         color = (170 - 20 * int (dist))
-        print(color)
+        #print(color)
         self.stars.append(
             Star(self.x_center + dist*10 * run, self.y_center + dist*10 * rise, rise, run, dist,[color, color, color])
         )
-        print(self.stars)# DEBUG
+        #print(self.stars)# DEBUG
         # move each star
         for star in self.stars:
             star.move()

@@ -15,7 +15,7 @@ class Versus_Solver:
         self.background = [20,20,20]
         self.deep_grid = Pixel_Grid(self.x_size, self.y_size, self.background)
         self.deep_maze = Maze(self.deep_grid, self.x_size//2, self.y_size//2 )
-        self.deep_solver = Deep_Maze_Solver(self.deep_grid, show_solve=True, show_seek=True, show_retreat=True)
+        self.deep_solver = Deep_Maze_Solver(self.deep_grid, show_solve=True, show_seek=True, show_retreat=False)
         self.wide_grid = Pixel_Grid(self.x_size, self.y_size, self.background)
         self.wide_maze = Maze(self.wide_grid, self.x_size//2, self.y_size//2)
         self.wide_solver = Wide_Maze_Solver(self.wide_grid, show_solve=True )
