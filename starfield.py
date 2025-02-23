@@ -35,30 +35,10 @@ class Starfield:
         self.draw()
         return True
 
-        # self.droplets.append(Droplet(random.randint(1,self.x_size-2), self.y_size, [10, 10, 200]))
-        # # move each drop
-        # for drop in self.droplets:
-        #     if not drop.move():
-        #         self.droplets.remove(drop)
-        #         self.drop_count += 1
-        # # if enough drops have fallen raise the water level by 1 row
-        # if self.fillable:
-        #     if self.drop_count > (self.x_size * 5):
-        #         self.water_level -= 1
-        #         self.drop_count = 0
-        #         # don't raise the water level above max
-        #         if self.water_level < self.max_water_level:
-        #             #self.water_level = self.max_water_level
-        #             return False
-        #
-        # self.draw()
-        # return True
 
 
 class Star:
     def __init__(self, x, y, rise, run, dist, color):
-        #self.x_pos = run * 5 * speed
-        #self.y_pos = rise * 5 * speed
         self.x_pos = x
         self.y_pos = y
         self.rise = rise
@@ -68,21 +48,8 @@ class Star:
 
     def move(self):
         """moves the star"""
-        #self.x_pos += self.run * self.speed
-        #self.y_pos += self.rise * self.speed
         self.x_pos += self.run
         self.y_pos += self.rise
-        #self.rise = self.rise * 1.1
-        #self.run = self.run * 1.1
-        # if self.rise > 0:
-        #     self.rise += (6-self.dist)/100
-        # else:
-        #     self.rise -= (6-self.dist)/100
-        #
-        # if self.run > 0:
-        #     self.run += (6-self.dist)/100
-        # else:
-        #     self.run -= (6-self.dist)/100
         self.rise = self.rise* (1+(6-self.dist)/100)
         self.run = self.run* (1+(6-self.dist)/100)
 
